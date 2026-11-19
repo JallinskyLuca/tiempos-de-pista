@@ -4,6 +4,7 @@ node_modules/
 out/
 coverage/
 .vercel/
+.netlify/
 .env*
 !.env.example
 next-env.d.ts
