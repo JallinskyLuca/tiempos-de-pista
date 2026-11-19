@@ -1,0 +1,62 @@
+import { expect, test } from '@playwright/test';
+
+const eventPath = '/categoria/tc/archivo/2026/14';
+
+test('resultados, favoritos y descarga sobreviven a cerrar y abrir sin conexión', async ({ page, context }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await page.goto(eventPath);
+  await expect(page.getByRole('heading', { level: 1 })).toContainText(/cuarto/i);
+  await page.evaluate(async () => { await navigator.serviceWorker.ready; });
+  await page.getByRole('button', { name: 'Seguir fecha' }).click();
+  await expect(page.getByRole('button', { name: 'En favoritos' })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: 'Guardar sin conexión' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'Fecha guardada.' })).toBeVisible();
+  await page.goto('/favoritos');
+  await expect(page.locator('.favorite-list')).toContainText(/cuarto/i);
+  await page.reload();
+  await expect(page.locator('.favorite-list')).toContainText(/cuarto/i);
+  const saved = await context.request.get('/api/fechas/tc/2026/14').then((response) => response.json());
+  await page.close();
+  await context.setOffline(true);
+  const reopened = await context.newPage();
+  await reopened.goto(eventPath);
+  await expect(reopened.locator('#event')).toContainText('Copia guardada el');
+  await expect(reopened.locator('#event h2').first()).toContainText(/cuarto/i);
+  const tabs = reopened.locator('#event nav button');
+  await expect(tabs).toHaveCount(saved.event.tables.length);
+  const last = saved.event.tables.at(-1);
+  await tabs.last().click();
+  await expect(reopened.locator('#event table tbody tr').first()).toBeVisible();
+  await expect(reopened.locator('#event table').first().locator('tbody tr')).toHaveCount(last.rows.length);
+  await reopened.goto('/categoria/tc/archivo/1937/1');
+  await expect(reopened.locator('#message')).toContainText('no está descargada');
+  await context.setOffline(false);
+  await reopened.goto('/descargas');
+  await reopened.getByRole('button', { name: 'Eliminar', exact: true }).click();
+  await expect(reopened.locator('.favorite-list li')).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
+test('tablas filtrables, agenda argentina, manifest y calendario descargable', async ({ page, request }) => {
+  await page.goto(eventPath);
+  const filter = page.getByRole('searchbox', { name: 'Filtrar tabla' });
+  await filter.fill('Rossi');
+  await expect(page.locator('#resultado tbody tr')).toHaveCount(1);
+  await expect(page.locator('#resultado tbody tr')).toContainText(/rossi/i);
+  await filter.fill('zzzzzzzz');
+  await expect(page.getByText('No hay coincidencias.')).toBeVisible();
+  await filter.clear();
+  await page.locator('#resultado thead button').first().click();
+  await expect(page.locator('#resultado thead th').first()).toHaveAttribute('aria-sort', 'ascending');
+  const manifest = await request.get('/manifest.webmanifest').then((response) => response.json());
+  expect(manifest.display).toBe('standalone');
+  expect(manifest.icons.some((icon: { sizes: string }) => icon.sizes === '512x512')).toBe(true);
+  const calendar = await request.get('/api/fechas/tc/2026/14/calendario');
+  expect(calendar.headers()['content-type']).toContain('text/calendar');
+  expect(await calendar.text()).toContain('BEGIN:VCALENDAR');
+  expect((await request.get('/api/fechas/tc/1900/nonexistent')).status()).toBe(404);
+  await page.goto('/?semana=2026-11-16&categoria=f1');
+  await expect(page.getByRole('heading', { name: 'Agenda de la semana' })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+});

@@ -1,0 +1,50 @@
+name: Actualizar resultados en días de actividad
+on:
+  schedule:
+    - cron: '17,47 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: publish-racing-data
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Comprobar el calendario sin consultar proveedores
+        id: calendar
+        run: node scripts/update-data.mjs --check
+      - if: steps.calendar.outputs.active == 'true'
+        run: npm ci
+      - name: Consultar y validar fuentes
+        if: steps.calendar.outputs.active == 'true'
+        id: import
+        continue-on-error: true
+        run: npm run data:update
+      - name: Verificar reglas de publicación
+        if: steps.calendar.outputs.active == 'true'
+        run: npm run test
+      - name: Publicar solo cuando cambian los datos
+        if: steps.calendar.outputs.active == 'true'
+        shell: bash
+        run: |
+          if git diff --quiet -- data/archive data/f1-media.json public/pilotos && [ "$(node scripts/health-change.mjs)" = "false" ]; then
+            echo "Las fuentes no publicaron nuevos resultados."
+            exit 0
+          fi
+          git config user.name "Tiempos de Pista"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/archive data/f1-media.json public/pilotos data/sync
+          git commit -m "Actualizar resultados publicados por las fuentes"
+          git push
+      - name: Informar fallas de proveedores
+        if: steps.import.outcome == 'failure'
+        run: exit 1

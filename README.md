@@ -1,0 +1,129 @@
+# Tiempos de Pista
+
+Agenda, resultados y archivo histórico de Turismo Carretera, Fórmula 1 y TN APAT. Incluye favoritos locales, exportación a calendario y una PWA con descarga explícita de fechas completas para consultar sin conexión.
+
+## Desarrollo local
+
+Requiere Node.js 24 y npm.
+
+```sh
+npm ci
+npm run dev -- --hostname 127.0.0.1 --port 3001
+```
+
+Abrí [localhost:3001](http://localhost:3001). El puerto 3000 queda disponible para otros proyectos. La agenda calcula la semana en Argentina y usa los mismos archivos que las fichas del archivo. Los horarios se guardan en UTC y se muestran en `America/Argentina/Buenos_Aires`.
+
+### Probar la PWA
+
+El service worker se habilita en producción. Para mantener el desarrollo abierto y probar la PWA en paralelo:
+
+```sh
+npm run build:pwa
+npm run start:pwa
+```
+
+Abrí [localhost:3002](http://localhost:3002). Esta compilación usa `.next-check/pwa`, separada de la de desarrollo. Si cambiás el código, detené ese servidor, repetí la compilación y volvé a iniciarlo. `PORT` permite elegir otro puerto.
+
+1. Abrí una fecha y elegí **Guardar sin conexión**.
+2. Esperá la confirmación y abrí **Mi app** para comprobar la descarga.
+3. Cerrá la pestaña, activá el modo sin conexión de DevTools y volvé a abrir la misma URL. También podés abrir `/offline.html` para elegir una copia.
+4. Recuperá la conexión y guardá la fecha otra vez para actualizarla. Mi app permite eliminar las copias.
+
+Las copias guardan todas las tablas y sesiones de la fecha, su revisión y la fecha de descarga en IndexedDB. El límite es de 20 fechas por dispositivo. El navegador puede eliminar almacenamiento; las descargas y favoritos no se sincronizan entre dispositivos. La vista local muestra cuándo se guardaron los datos.
+
+El manifest incluye iconos de 192/512 píxeles, maskable, Apple y accesos directos. Android ofrece instalación cuando el navegador la habilita; iPhone requiere Compartir → Agregar a inicio. La publicación para teléfonos requiere HTTPS: `localhost` sirve para probar en la computadora, y una dirección HTTP de la red local no equivale a una instalación móvil válida.
+
+La interfaz ofrece actualizar cuando un nuevo worker está esperando. El precaché incluye el lector local, fuentes, iconos y archivos estáticos versionados. Las navegaciones usan red con un límite de espera y recuperan el lector local si falla. El HTML de Next y las respuestas RSC no se reutilizan como páginas de otra versión. No hay cronometraje en vivo ni alertas push en esta entrega.
+
+## Archivo de datos
+
+Las tablas se sirven desde los JSON versionados en `data/archive`. El sitio no consulta a los proveedores cuando un lector abre una ficha.
+
+- **F1:** datos de [F1DB v2026.20.0](https://github.com/f1db/f1db/releases/tag/v2026.20.0) bajo [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), adaptados a las columnas del sitio. Incluye temporadas desde 1950 y las sesiones y estadísticas publicadas en la edición descargada.
+- **TC:** tablas de sesión de 2026, campeonatos desde 2010, lista de pilotos campeones y ganadores históricos desde 1937 según los [resultados](https://tiempos.actc.org.ar/resultados) y el [registro de ganadores de ACTC](https://actc.org.ar/institucional/ganadores). Las fechas con una clasificación incompleta conservan el ganador si está registrado. Las tablas detalladas anteriores a 2026 aún están pendientes.
+- **TN:** tablas HTML de APAT para las clases 2 y 3, en las fechas del [archivo de APAT](https://apat.org.ar/resultados/historico) desde 2003. Incluye las posiciones de 2026 y un registro parcial de campeones.
+
+Para reproducir F1: `node scripts/import-f1.mjs <directorio package/data de F1DB>`.
+
+Para actualizar la temporada nacional actual:
+
+```sh
+npm run import:tc -- --refresh
+npm run import:tn -- --refresh
+```
+
+También podés indicar `--year 2026 --through 2026-11-19`. Sin `--current`, el script intenta reconstruir el historial disponible en el proveedor. Los proveedores pueden cambiar la cobertura de sus páginas; una temporada solicitada que no corresponde al documento se rechaza.
+
+El caché de fuentes nacionales caduca a las 24 horas. `--refresh` vuelve a descargarlas. Las tablas nuevas registran URL, momento de descarga y SHA-256. La publicación valida fechas, dimensiones de tablas e identidades de eventos; admite empates históricos. Una fuente fallida, una página de verificación o la pérdida de tablas publicadas cancelan la importación.
+
+Cada publicación escribe temporadas inmutables en `data/archive/<categoría>/revisions`, conserva el índice anterior y reemplaza `index.json` mediante un renombrado atómico. Un bloqueo excluye publicaciones simultáneas de la misma categoría. Si un proceso termina abruptamente y deja `.publish-lock`, comprobá que ya no haya un importador activo antes de retirarlo. La conservación de revisiones requiere revisar el espacio disponible.
+
+La página [Fuentes y cobertura](http://localhost:3001/cobertura) muestra cuántas fechas tienen tablas y explica los faltantes. Tener una tabla no acredita que todas las sesiones de una fecha estén completas. El 19 de noviembre se actualizó TC e incorporó Río Cuarto; la actualización de TN encontró una pantalla de verificación y preservó los datos anteriores.
+
+Los logotipos identifican las categorías. Provienen de [ACTC](https://actc.org.ar/tc), [Formula 1](https://www.formula1.com/en) y [APAT](https://apat.org.ar/).
+
+## Plan
+
+El [plan de evolución](PLAN.md) define las entregas de calidad de datos, UX móvil, PWA con lectura sin conexión, backend editorial, estadísticas, alertas y nuevas categorías. Incluye dependencias, criterios de aceptación y la demo prevista para el portafolio.
+
+## Código
+
+- `src/app` contiene las rutas públicas de Next.js.
+- `src/components` contiene las tablas y la navegación compartidas.
+- `src/lib/racing.ts` define el modelo de lectura y el formato de fechas, horarios y puntos.
+- `src/lib/archive.ts` lee la revisión publicada; `dashboard.ts` arma la agenda desde la misma fuente.
+- `src/lib/saved-events.ts` y `public/offline-reader.js` comparten el esquema de descargas locales.
+- `src/app/sw.ts` define el service worker y `manifest.ts` la identidad instalable.
+
+## Pilotos y escuderías de F1
+
+La pestaña **Pilotos y escuderías** de cada temporada presenta las escuderías, motores, chasis y pilotos registrados en F1DB. Las fichas internas muestran el campeonato de ese año y los resultados del piloto. Las tablas conservan los identificadores de piloto y constructor junto al texto; filtrar u ordenar no pierde la asociación con su ficha.
+
+Los retratos se identifican mediante OpenF1 y se descargan de la CDN de Formula 1. Se optimizan a WebP de 240 píxeles y se cargan por demanda. Cuando no hay una identificación inequívoca se muestran iniciales. Se consideran el nombre, la abreviatura y la temporada; un apellido compartido no alcanza para asociar una cara. Las imágenes tienen su procedencia registrada en `data/f1-media.json`; la licencia CC BY 4.0 de F1DB corresponde a sus datos.
+
+Para regenerar los retratos y el catálogo desde una distribución F1DB ya descargada:
+
+```sh
+node scripts/import-f1-media.mjs .work-import/f1db/package/data
+node scripts/import-f1.mjs .work-import/f1db/package/data
+```
+
+## Actualización automática
+
+```sh
+npm run data:update -- --check
+npm run data:watch
+```
+
+El worker local revisa el calendario cada 15 minutos y permanece activo mientras el proceso y la computadora sigan encendidos. No consulta proveedores fuera de las ventanas elegidas. Con horarios conocidos, consulta desde una hora antes hasta seis horas después del inicio de cada sesión. Cuando el proveedor no ofrece horarios, usa los tres días de la fecha de 07:00 a 23:00 en Argentina. Si falta una final, reintenta durante los dos días posteriores; TN requiere finales de ambas clases. Al faltar el calendario del año nuevo, intenta obtenerlo los viernes a las 09:00. No depende de que alguien visite la web.
+
+`npm run data:update -- --force --category=f1` permite una revisión manual. Sin `--category`, incluye las tres categorías. No ejecutes simultáneamente dos workers; `.work-import/data-worker.lock` registra el PID y evita duplicados. Si un cierre abrupto deja ese bloqueo, comprobá que el proceso ya terminó antes de retirarlo.
+
+F1 comprueba la última publicación de GitHub de F1DB y descarga una distribución nueva solo si cambia la versión. Comprueba tamaño, URL y SHA-256 del archivo. TC y TN actualizan las fechas recientes y preservan las anteriores; se vuelven a consultar sus campeonatos. Las reducciones inesperadas de filas en una clasificación nacional requieren revisión en vez de publicarse automáticamente.
+
+Los controles registran consulta, éxito o error y publicación por separado en `data/sync/status.json`. Una consulta con resultados idénticos conserva la revisión y la fecha de publicación anteriores. La interfaz ofrece los detalles de la fuente, avisa si está demorada y detecta nuevas revisiones mientras la página está abierta. Ofrece cargar los nuevos resultados para conservar la sesión que el usuario está consultando.
+
+F1DB publica nuevas versiones después de las carreras. La actualización automática no convierte esa fuente en cronometraje en vivo; el momento en que cada resultado aparece depende del proveedor. [F1DB](https://github.com/f1db/f1db) · [Acceso de OpenF1](https://openf1.org/docs/)
+
+### Ejecución alojada
+
+`.github/workflows/update-data.yml` prepara una revisión cada 30 minutos. Primero comprueba el calendario sin instalar dependencias ni consultar proveedores. Solo publica un commit cuando cambian los datos o el estado de disponibilidad de una fuente. El despliegue debe estar conectado al repositorio para recibir esos commits. Los secretos de despliegue y un repositorio remoto no están configurados en esta carpeta: el workflow preparado todavía no equivale a una tarea activa en GitHub.
+
+GitHub puede demorar los cron y deshabilita tareas programadas en repositorios públicos sin actividad durante 60 días. El mecanismo requiere monitoreo y revisar las cuotas del plan; no ofrece una garantía de actualización al minuto. [Condiciones de schedule](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).
+
+## Verificación
+
+```sh
+npm run lint
+npm run typecheck
+npm run test
+npm run build:pwa
+npx playwright install chromium
+npm run test:e2e
+```
+
+Playwright inicia la compilación PWA en 3002 si no está activa. En Windows con Chrome instalado se puede usar `$env:PLAYWRIGHT_CHANNEL='chrome'` antes del último comando. CI ejecuta los controles y usa Chromium.
+
+Las pruebas unitarias cubren límites de fecha argentina, importación, publicación fallida, rectificación e ICS. Las pruebas de navegador cubren filtros, favoritos persistentes, descargas completas, cierre y reapertura sin red, fechas no guardadas y borrado de copias, con vistas de escritorio y móvil. La emulación móvil no reemplaza la comprobación de instalación en Android y iPhone reales. La actualización entre dos versiones desplegadas y las mediciones de rendimiento siguen pendientes.
+
+La [verificación de esta iteración](docs/VERIFICACION.md) registra también los controles de accesibilidad automatizada, fichas de F1, asociación de retratos y ejecución del actualizador.

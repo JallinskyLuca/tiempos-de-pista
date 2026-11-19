@@ -1,0 +1,37 @@
+import Link from 'next/link';
+import { connection } from 'next/server';
+import { getArchive, sources } from '@/lib/archive';
+import { categories, type Category } from '@/lib/racing';
+import { CompetitionLogo } from '@/components/racing-ui';
+import { DataFreshness } from '@/components/data-freshness';
+
+const scope = {
+  f1: 'Las sesiones y estadísticas disponibles en la versión publicada de F1DB. Las fechas futuras pueden tener cronograma sin resultados. Los datos se adaptaron a las tablas del sitio y se distribuyen bajo CC BY 4.0.',
+  tc: 'Clasificaciones de sesión de 2026, campeonatos desde 2010 y ganadores históricos desde 1937. Hay fechas que conservan el ganador sin clasificación completa. Las tablas detalladas anteriores a 2026 están pendientes.',
+  tn: 'Tablas de clases 2 y 3 disponibles en el archivo HTML de APAT desde 2003. Las posiciones históricas y el registro de campeones tienen cobertura parcial.',
+};
+
+export default async function CoveragePage() {
+  await connection();
+  const archives = await Promise.all((Object.keys(categories) as Category[]).map(async (category) => ({ category, index: await getArchive(category) })));
+  return <>
+    <header className="edition-heading"><h1>Fuentes y cobertura</h1><p>Qué podés consultar en el archivo y hasta dónde llegan los datos disponibles.</p></header>
+    <div className="archive-stack">
+      {archives.map(({ category, index }) => {
+        const oldest = index.seasons.at(-1)?.year;
+        const latest = index.seasons[0]?.year;
+        const results = index.seasons.reduce((count, season) => count + season.results, 0);
+        const events = index.seasons.reduce((count, season) => count + season.rounds, 0);
+        return <section className="panel" key={category}>
+          <div className="section-heading"><h2><CompetitionLogo category={category} /> {categories[category].name}</h2></div>
+          <p className="empty"><strong>{oldest}–{latest} · {index.seasons.length} temporadas</strong><br />{results.toLocaleString('es-AR')} de {events.toLocaleString('es-AR')} fechas tienen al menos una tabla. Este indicador no implica que todas las sesiones estén completas.</p>
+          <p className="empty">{scope[category]}</p>
+          <DataFreshness category={category} />
+          <p className="empty">{index.generatedAt ? `Última publicación del archivo: ${new Intl.DateTimeFormat('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', dateStyle: 'medium', timeStyle: 'short' }).format(new Date(index.generatedAt))}.` : 'La primera importación no registró una fecha de actualización.'} Las actualizaciones se publican por importación; la web no ofrece cronometraje en vivo.</p>
+          <Link className="source" href={`/categoria/${category}/archivo/${latest}`}>Explorar resultados</Link><a className="source" href={sources[category].url} rel="noreferrer" target="_blank">Fuente: {sources[category].name}</a>
+        </section>;
+      })}
+    </div>
+    <section className="panel event-schedule"><div className="section-heading"><h2>Cómo se actualizan los resultados</h2></div><p className="empty">El actualizador consulta las fuentes durante las ventanas de actividad del calendario. Si falta una final, reintenta durante los dos días siguientes. Una respuesta incompleta o bloqueada conserva los resultados anteriores. La última consulta y la última publicación se registran por separado.</p><p className="empty">F1DB publica versiones después de las carreras. La disponibilidad de cada sesión depende del proveedor. La web no ofrece cronometraje en vivo. Los retratos de F1 provienen de las imágenes identificadas por OpenF1 en la CDN de Formula 1; se muestran iniciales cuando no hay un retrato identificado.</p></section>
+  </>;
+}
