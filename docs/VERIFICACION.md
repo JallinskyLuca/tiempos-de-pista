@@ -20,4 +20,20 @@ El worker local quedó activo y su revisión de calendario sin actividad no cons
 
 ## Alcance pendiente
 
-Las capturas y tests se encuentran en `.work-import/previews` y no se versionan como contenido del sitio. La prueba móvil es emulación de pantalla en Chrome. Queda verificar instalación en Android y iPhone físicos, actualización de PWA entre despliegues, rendimiento móvil medido y activación del workflow en un repositorio remoto con despliegue conectado. El worker local depende de que la computadora siga encendida.
+Las capturas y tests se encuentran en `.work-import/previews` y no se versionan como contenido del sitio. La prueba móvil es emulación de pantalla en Chrome. Queda verificar instalación en Android y iPhone físicos, actualización de PWA entre despliegues y rendimiento móvil medido. El worker local depende de que la computadora siga encendida; el workflow alojado indicado a continuación funciona desde GitHub.
+
+## Despliegue verificado el 20 de noviembre de 2026
+
+Sitio público: [tiempos-de-pista.netlify.app](https://tiempos-de-pista.netlify.app). Versión de aplicación publicada: commit `935bf1c`, con Node.js 24 y el adaptador oficial de Next.js para Netlify. El equipo usa Free y tiene las recargas automáticas desactivadas.
+
+Se configuró una clave de despliegue de solo lectura para el repositorio y un webhook de cambios. El push de la corrección inició automáticamente la compilación de Netlify. La visibilidad del sitio permite visitas sin iniciar sesión en Netlify.
+
+Comprobaciones sobre el dominio público, sin credenciales de visitante:
+
+- Portada, archivos de F1/TC/TN, fichas de piloto y escudería, API de resultados, API de revisiones e ICS respondieron con HTTP 200.
+- Manifest, service worker y lector sin conexión respondieron con tipo de contenido correcto. El worker se sirve con `no-cache, no-store, must-revalidate`.
+- Las 10 pruebas Playwright pasaron contra el dominio HTTPS publicado, en escritorio y pantalla móvil. Incluyen guardar una fecha completa, cerrar la página, abrirla nuevamente sin red, cambiar la sesión guardada y eliminar la copia.
+- Las pruebas de contraste y accesibilidad de las pantallas revisadas pasaron sobre la versión alojada. La validación del estado HTTP evita confundir la página 404 del proveedor con una pantalla válida del producto.
+- Se observaron ejecuciones programadas exitosas del workflow de actualización en GitHub. Sus ventanas de actividad y la conservación de datos ante errores se validan también con las pruebas unitarias del proyecto.
+
+La instalación y apertura en teléfonos físicos sigue pendiente; la emulación móvil y el modo sin red del navegador no la sustituyen. Las cuotas del hosting y la demora de publicación de cada proveedor siguen condicionando la operación.

@@ -8,7 +8,7 @@ Se consolidó el CSS en un sistema de contraste, controles de 44 px, foco visibl
 
 F1 incorpora un catálogo por temporada de pilotos, escuderías, motores y chasis, fichas internas, referencias estables por fila y retratos identificados mediante OpenF1. El piloto del día muestra la distinción y el porcentaje de votos provistos por F1DB. No se atribuye una cara por una coincidencia ambigua de apellido.
 
-El worker local consulta fuentes en ventanas de actividad y conserva datos válidos ante errores. Una consulta sin cambios no renueva la fecha de publicación. Hay un workflow preparado para GitHub, cuya activación y conexión con el despliegue requieren un repositorio remoto. Los perfiles de F1 incorporados cubren la temporada elegida; la trayectoria consolidada entre temporadas, las fichas nacionales y la calculadora siguen pendientes.
+El worker local consulta fuentes en ventanas de actividad y conserva datos válidos ante errores. Una consulta sin cambios no renueva la fecha de publicación. El workflow de GitHub está activo y el repositorio está conectado al despliegue público de Netlify desde el 20 de noviembre de 2026. Los perfiles de F1 incorporados cubren la temporada elegida; la trayectoria consolidada entre temporadas, las fichas nacionales y la calculadora siguen pendientes.
 
 ## Avance de implementación
 

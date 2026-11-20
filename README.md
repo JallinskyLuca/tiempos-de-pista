@@ -107,7 +107,21 @@ F1DB publica nuevas versiones después de las carreras. La actualización autom�
 
 ### Ejecución alojada
 
-`.github/workflows/update-data.yml` prepara una revisión cada 30 minutos. Primero comprueba el calendario sin instalar dependencias ni consultar proveedores. Solo publica un commit cuando cambian los datos o el estado de disponibilidad de una fuente. El despliegue debe estar conectado al repositorio para recibir esos commits. Los secretos de despliegue y un repositorio remoto no están configurados en esta carpeta: el workflow preparado todavía no equivale a una tarea activa en GitHub.
+El sitio está publicado en [tiempos-de-pista.netlify.app](https://tiempos-de-pista.netlify.app), conectado a la rama `main` de [JallinskyLuca/tiempos-de-pista](https://github.com/JallinskyLuca/tiempos-de-pista). Netlify usa Node.js 24 y el adaptador oficial `@netlify/plugin-nextjs` declarado en `netlify.toml`, necesario para servir las páginas dinámicas y las APIs. La conexión usa una clave de despliegue de solo lectura y un webhook de cambios del repositorio.
+
+`.github/workflows/update-data.yml` está activo y tiene una programación cada 30 minutos. Primero comprueba el calendario sin instalar dependencias ni consultar proveedores. Solo publica un commit cuando cambian los datos o el estado de disponibilidad de una fuente. Los cambios de `main` disparan un despliegue en Netlify. El control de calendario corre en GitHub, por lo que no depende de que la computadora local esté encendida.
+
+El equipo de Netlify quedó en Free, con recargas automáticas desactivadas. Los despliegues y el uso de la web consumen su cuota compartida; al agotarla el servicio puede pausarse. La publicación frecuente de resultados debe monitorearse dentro de esa cuota. Para cambios de documentación que no requieran desplegar, Netlify admite `[skip netlify]` en el mensaje del commit.
+
+Para comprobar el despliegue con las mismas pruebas de navegador:
+
+```powershell
+$env:PLAYWRIGHT_BASE_URL='https://tiempos-de-pista.netlify.app'
+$env:PLAYWRIGHT_CHANNEL='chrome'
+npm run test:e2e
+```
+
+Al definir `PLAYWRIGHT_BASE_URL`, Playwright no inicia el servidor local. Quitá la variable para volver a probar la compilación local.
 
 GitHub puede demorar los cron y deshabilita tareas programadas en repositorios públicos sin actividad durante 60 días. El mecanismo requiere monitoreo y revisar las cuotas del plan; no ofrece una garantía de actualización al minuto. [Condiciones de schedule](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).
 
