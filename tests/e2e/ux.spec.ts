@@ -44,7 +44,9 @@ test('piloto del día, cambio de sesión y botones visibles', async ({ page }, t
 test('la interfaz compartida conserva accesibilidad y reflujo en las pantallas principales', async ({ page }, testInfo) => {
   if (testInfo.project.name === 'mobile') await page.setViewportSize({ width: 360, height: 800 });
   for (const path of ['/', '/archivo', '/categoria/tc/archivo/2026/14', '/categoria/tn/archivo/2026?vista=posiciones', '/descargas', '/apoyar']) {
-    await page.goto(path);
+    const response = await page.goto(path);
+    expect(response?.status(), path).toBe(200);
+    await expect(page.locator('.wordmark')).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), path).toBe(true);
     const result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
     expect(result.violations.map((violation) => ({ id: violation.id, targets: violation.nodes.map((node) => node.target) })), path).toEqual([]);
