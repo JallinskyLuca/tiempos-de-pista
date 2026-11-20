@@ -18,7 +18,8 @@
     "import:tc": "node scripts/import-national.mjs tc --current",
     "import:tn": "node scripts/import-national.mjs tn --current",
     "data:update": "node scripts/update-data.mjs",
-    "data:watch": "node scripts/data-worker.mjs"
+    "data:watch": "node scripts/data-worker.mjs",
+    "media:update": "node scripts/import-videos.mjs"
   },
   "dependencies": {
     "@fontsource/barlow-condensed": "5.2.8",

@@ -5,6 +5,7 @@ import { categories, formatDate, formatTime, type Category } from '@/lib/racing'
 import { CategoryNav, CategoryTag, CompetitionLogo, RaceDate } from './racing-ui';
 import { DataTable } from './archive-ui';
 import { DataFreshness } from './data-freshness';
+import { NewsSection, VideoSection } from './paddock-content';
 
 function EventList({ events }: { events: ListedEvent[] }) {
   return (
@@ -23,7 +24,7 @@ function EventList({ events }: { events: ListedEvent[] }) {
   );
 }
 
-export async function Overview({ selectedDate, filter }: { selectedDate?: string; filter?: Category }) {
+export async function Overview({ selectedDate, filter, kind = 'calendar' }: { selectedDate?: string; filter?: Category; kind?: 'home' | 'calendar' | 'category' }) {
   const dashboard = await getDashboard(new Date(), selectedDate);
   const { week, snapshots } = dashboard;
   const sessions = dashboard.sessions.filter(({ event }) => !filter || event.category === filter);
@@ -32,36 +33,42 @@ export async function Overview({ selectedDate, filter }: { selectedDate?: string
   const upcoming = dashboard.upcoming.filter((event) => !filter || event.category === filter).slice(0, 6);
   const tables = dashboard.championships.filter((table) => !filter || table.category === filter);
   const suffix = filter ? `&categoria=${filter}` : '';
+  const currentYear = snapshots.find((snapshot) => snapshot.category === filter)?.index.seasons[0]?.year;
+  const base = filter && currentYear ? `/categoria/${filter}/archivo/${currentYear}` : '/archivo';
+  const headline = kind === 'home' ? 'Actualidad de pista' : kind === 'category' && filter ? categories[filter].name : 'Este finde';
+  const featured = filter ? weekend[0] ?? dashboard.upcoming.find((event) => event.category === filter) ?? previous[0] : undefined;
 
   return (
     <>
-      <CategoryNav />
-      <header className="front-hero">
+      <CategoryNav active={filter} />
+      <header className="front-hero" data-category={filter}>
         <div>
-          <h1>Este <span>finde</span></h1>
+          <h1>{headline}</h1>
           <p>{formatDate(week.start)} al {formatDate(week.end)} de {week.end.slice(0, 4)} <span>·</span> Hora argentina</p>
         </div>
         <div className="front-hero-mark" aria-hidden="true"><span className="flag" /></div>
       </header>
-      <div className="competition-strip" aria-label="Archivos de las competencias">
+      {kind !== 'category' ? <div className="competition-strip" aria-label="Centros de las competencias">
         {snapshots.map(({ category, index }) => (
-          <Link key={category} href={`/categoria/${category}/archivo/${index.seasons[0].year}`} data-category={category}>
+          <Link key={category} href={`/categoria/${category}`} data-category={category}>
             <CompetitionLogo category={category} />
-            <span><strong>{categories[category].name}</strong><small>Calendario y archivo</small></span>
+            <span><strong>{categories[category].name}</strong><small>Noticias, videos y resultados · {index.seasons[0].year}</small></span>
           </Link>
         ))}
-      </div>
+      </div> : <nav className="hub-actions" aria-label="Explorar la competencia"><Link className="button button-primary" href={base}>Calendario y resultados</Link><Link className="button" href={`${base}?vista=posiciones`}>Posiciones</Link>{filter === 'f1' ? <Link className="button" href={`${base}?vista=escuderias`}>Pilotos y escuderías</Link> : null}<Link className="button" href={`${base}?vista=campeones`}>Historia y campeones</Link></nav>}
       {filter ? <DataFreshness category={filter} /> : null}
+      {kind === 'category' && featured ? <section className="featured-event panel" data-category={filter} aria-labelledby="fecha-destacada"><div><p>{weekend.some((event) => event.id === featured.id) ? 'Este fin de semana' : featured.date > week.today ? 'Próxima fecha' : 'Última fecha con resultados'}</p><h2 id="fecha-destacada">{featured.name}</h2><span>Fecha {featured.round} · {formatDate(featured.date)} {featured.year}</span></div><Link className="button button-primary" href={eventHref(featured.category, featured.year, featured.id)}>Horarios y sesiones</Link></section> : null}
+      {kind !== 'calendar' ? <div className="paddock-content"><NewsSection category={filter} /><VideoSection category={filter} /></div> : null}
       <div className="week-controls">
-        <nav className="archive-tabs" aria-label="Filtrar agenda">
+        {kind !== 'category' ? <nav className="archive-tabs" aria-label="Filtrar agenda">
           <Link href={`?semana=${week.start}`} aria-current={!filter ? 'page' : undefined}>Todas</Link>
           {(Object.keys(categories) as Category[]).map((category) => (
             <Link key={category} href={`?semana=${week.start}&categoria=${category}`} aria-current={category === filter ? 'page' : undefined}>{categories[category].short}</Link>
           ))}
-        </nav>
+        </nav> : null}
         <nav className="week-navigation" aria-label="Cambiar semana">
           <Link href={`?semana=${week.previous}${suffix}`}>Anterior</Link>
-          <Link href="/">Esta semana</Link>
+          <Link href={kind === 'category' && filter ? `/categoria/${filter}` : kind === 'home' ? '/' : '/calendario'}>Esta semana</Link>
           <Link href={`?semana=${week.next}${suffix}`}>Siguiente</Link>
         </nav>
       </div>
@@ -94,7 +101,7 @@ export async function Overview({ selectedDate, filter }: { selectedDate?: string
             ) : null}
           </section>
           <section className="panel">
-            <div className="section-heading"><h2>Últimos resultados</h2><Link className="inline-link" href="/archivo">Explorar archivo</Link></div>
+            <div className="section-heading"><h2>Últimos resultados</h2><Link className="inline-link" href={base}>Explorar archivo</Link></div>
             {previous.length ? <EventList events={previous} /> : <p className="empty">No hay resultados para esta selección.</p>}
           </section>
           <section className="panel">

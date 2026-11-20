@@ -5,7 +5,7 @@ import { archiveRaceHref, categories, formatDate, formatPoints, type Category, t
 export function CategoryNav({ active }: { active?: Category }) {
   return (
     <nav className="category-nav" aria-label="Categorías">
-      <Link href="/" aria-current={active === undefined ? 'page' : undefined}><span className="flag" aria-hidden="true" /> <span className="wide-category-name">Este finde</span><span className="compact-category-name">Inicio</span></Link>
+      <Link href="/" aria-current={active === undefined ? 'page' : undefined}><span className="flag" aria-hidden="true" /> <span>Inicio</span></Link>
       {(Object.keys(categories) as Category[]).map((id) => (
         <Link key={id} href={`/categoria/${id}`} data-category={id}
           aria-current={active === id ? 'page' : undefined}>

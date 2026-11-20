@@ -2,6 +2,8 @@
 
 Documento de trabajo del 19 de noviembre de 2026.
 
+La siguiente versión se organiza en [el plan de v1.1.0](docs/V1.1.0.md), con Home general, centros por categoría, resúmenes oficiales, datos por sesión F1, logos, calendario destacado, temas y Wake Lock. Se implementa y verifica por entregas.
+
 ### Iteración de UX y automatización
 
 Se consolidó el CSS en un sistema de contraste, controles de 44 px, foco visible y acciones principales distinguibles. La elección de sesión usa un selector para reducir la cantidad de botones; la información de actualización se despliega bajo demanda. `DESIGN.md` registra la dirección visual.

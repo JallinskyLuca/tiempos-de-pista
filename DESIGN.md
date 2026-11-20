@@ -29,4 +29,21 @@ Se revisó el diseño contra la consigna: se conservan el fondo oscuro y las tab
 
 ## Datos visibles
 
+## Portada y centros de categoría · v1.1.0
+
+Se conserva el sistema asfalto `#0b1018`, boxes `#162233`, texto `#f4f7fb`, acero `#bdcadb`, celeste `#a4e2ff` y borde `#7a91ac`. Barlow Condensed identifica titulares; sistema nativo para noticias y controles. Todo alineado a la izquierda.
+
+La Home abre con accesos claros a F1, TC y TN y reúne actividad, noticias y videos. Cada categoría abre con su identidad y accesos a calendario, posiciones e historia; los contenidos siguientes pertenecen solo a esa competencia. Los videos usan una portada tipográfica con logo local, tipo de sesión y botón de carga, evitando imágenes externas y peso de reproductores antes de la interacción.
+
+```text
+Inicio | F1 | TC | TN
+Actualidad de pista / Identidad de la categoría
+Entradas a categorías / Accesos de temporada
+Noticias propias breves + fuente
+Resúmenes oficiales, reproductor bajo demanda
+Agenda del fin de semana | Campeonatos
+```
+
+Revisión contra la consigna: se mantienen las tablas y el modo oscuro liviano. Se distinguen portada general y centros sin duplicar páginas completas de archivo. Se usan acentos de categoría como orientación, texto explícito para cada acción y ningún carrusel o reproducción automática.
+
 La hora de consulta y la hora de publicación son distintas. Una consulta sin cambios no renueva la antigüedad del resultado. Los errores conservan los resultados publicados y se muestran como una demora de la fuente. La web no afirma un estado “en vivo” a partir del horario previsto.

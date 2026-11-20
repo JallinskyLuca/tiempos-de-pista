@@ -8,6 +8,7 @@ import { EventActions } from '@/components/event-actions';
 import { DriverOfTheDay } from '@/components/f1-guide';
 import { DataFreshness } from '@/components/data-freshness';
 import { SessionPicker } from '@/components/session-picker';
+import { VideoSection } from '@/components/paddock-content';
 
 type Props = {
   params: Promise<{ categoria: string; year: string; round: string }>;
@@ -76,6 +77,7 @@ export default async function ArchiveRacePage({ params, searchParams }: Props) {
           </ul>
         </section>
       ) : null}
+      <VideoSection category={categoria} event={{ year: Number(year), id: event.id }} />
       <p className="archive-credit">Datos de <a href={table?.sourceUrl ?? (event.winner && categoria === 'tc' ? 'https://actc.org.ar/institucional/ganadores' : source.url)} target="_blank" rel="noreferrer">{source.name}</a>{categoria === 'f1' ? ' · Datos adaptados al formato de Tiempos de Pista.' : '.'}</p>
     </>
   );

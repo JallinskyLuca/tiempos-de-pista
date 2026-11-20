@@ -1,5 +1,15 @@
 # Verificación de UX, F1 y actualización de datos
 
+## Entrega inicial de v1.1.0 · 20 de noviembre de 2026
+
+Home editorial general y centros separados de F1, TC y TN, noticias breves internas y cinco resúmenes oficiales importados (tres F1, uno TC y uno TN). La asociación de las prácticas 2026 de Las Vegas no incluye el resumen histórico de 2025 publicado esta semana.
+
+Comprobado localmente: lint y TypeScript sin errores, compilación de producción PWA, 26 pruebas unitarias y 14 pruebas Playwright en escritorio y móvil. La auditoría Axe pasó para Home y los tres centros; las capturas de 360 px no muestran desbordamiento horizontal. La prueba del reproductor intercepta la respuesta del iframe para comprobar su carga y cierre sin reproducir contenido remoto. YouTube oEmbed respondió HTTP 200 y canal correcto para los resúmenes de F1 FP2, TC Río Cuarto y TN Concordia. Esto no garantiza permisos de reproducción en todas las regiones.
+
+Se comprobó que la Home no solicita YouTube, ytimg ni googlevideo antes de una acción. Las pruebas existentes de descarga completa y reapertura sin red siguen pasando. Las noticias iniciales son una selección editorial revisada, no un feed automático. Los demás bloques de v1.1.0, incluida la integración por sesión de OpenF1, siguen pendientes.
+
+La investigación de OpenF1 verificó resultados FP2 y muestras reales de telemetría de FP1/FP2 sin autenticación. [OPENF1.md](OPENF1.md) registra claves, fuentes y validaciones necesarias; no se presenta esa investigación como una integración ya implementada.
+
 19 de noviembre de 2026. Entorno local Windows, Node.js 24, Next.js 16.4.6. Producción compilada con Webpack y Serwist; desarrollo con Turbopack.
 
 ## Resultado comprobado

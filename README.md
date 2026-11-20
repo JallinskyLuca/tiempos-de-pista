@@ -1,5 +1,11 @@
 # Tiempos de Pista
 
+Primera entrega de la evolución [v1.1.0](docs/V1.1.0.md): Home general, centros propios en `/categoria/f1`, `/categoria/tc` y `/categoria/tn`, breves editoriales con lectura interna y biblioteca de resúmenes oficiales. El resto de los bloques sigue en desarrollo; no se ha etiquetado la versión final.
+
+`npm run media:update` consulta los feeds públicos de FORMULA 1, ACTC Argentina y TN APAT, verifica canal/identificador/año y conserva hasta 60 resúmenes por competencia. Los errores no borran la biblioteca previa. La tarea alojada lo ejecuta durante las ventanas de actividad junto con la actualización de resultados; las visitas no consultan YouTube para construir las páginas. El reproductor `youtube-nocookie.com` se carga solo al pulsar **Cargar video**. Las restricciones del titular o de la región pueden impedir reproducir un video; el acceso al original queda disponible.
+
+Las noticias iniciales son breves propios revisados, con fuente primaria; no constituyen un feed automático de noticias. La integración de resultados/telemetría por sesión está diseñada en [OPENF1.md](docs/OPENF1.md): el vivo es pago y la consulta histórica gratuita queda disponible fuera de la ventana de sesión.
+
 Agenda, resultados y archivo histórico de Turismo Carretera, Fórmula 1 y TN APAT. Incluye favoritos locales, exportación a calendario y una PWA con descarga explícita de fechas completas para consultar sin conexión.
 
 ## Desarrollo local

@@ -1,14 +1,9 @@
 import type { Metadata } from 'next';
-import { notFound, redirect } from 'next/navigation';
-import { getArchive } from '@/lib/archive';
+import { notFound } from 'next/navigation';
+import { Overview } from '@/components/overview';
 import { categories, isCategory } from '@/lib/racing';
 
 type Props = { params: Promise<{ categoria: string }> };
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-  return Object.keys(categories).map((categoria) => ({ categoria }));
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { categoria } = await params;
@@ -16,9 +11,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: categories[categoria].name };
 }
 
-export default async function CategoryPage({ params }: Props) {
+export default async function CategoryPage({ params, searchParams }: Props & { searchParams: Promise<{ semana?: string }> }) {
   const { categoria } = await params;
   if (!isCategory(categoria)) notFound();
-  const archive = await getArchive(categoria);
-  redirect(`/categoria/${categoria}/archivo/${archive.seasons[0].year}`);
+  const { semana } = await searchParams;
+  return <Overview kind="category" filter={categoria} selectedDate={typeof semana === 'string' ? semana : undefined} />;
 }

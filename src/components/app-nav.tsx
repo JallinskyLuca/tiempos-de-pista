@@ -15,7 +15,7 @@ export function AppNav() {
   const pathname = usePathname();
   return (
     <nav className="app-nav" aria-label="Navegación principal">
-      {links.map(([href, label, path]) => <Link href={href} key={href} aria-current={pathname === href || href === '/archivo' && pathname.startsWith('/categoria/') ? 'page' : undefined}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round" aria-hidden="true"><path d={path} /></svg><span>{label}</span></Link>)}
+      {links.map(([href, label, path]) => <Link href={href} key={href} aria-current={pathname === href || href === '/archivo' && pathname.includes('/archivo/') ? 'page' : undefined}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round" aria-hidden="true"><path d={path} /></svg><span>{label}</span></Link>)}
     </nav>
   );
 }
