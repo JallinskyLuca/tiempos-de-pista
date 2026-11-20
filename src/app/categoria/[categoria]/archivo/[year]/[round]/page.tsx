@@ -9,6 +9,9 @@ import { DriverOfTheDay } from '@/components/f1-guide';
 import { DataFreshness } from '@/components/data-freshness';
 import { SessionPicker } from '@/components/session-picker';
 import { VideoSection } from '@/components/paddock-content';
+import { getEventSessions } from '@/lib/openf1';
+import { F1Analysis } from '@/components/f1-analysis';
+import { WakeLockControl } from '@/components/wake-lock';
 
 type Props = {
   params: Promise<{ categoria: string; year: string; round: string }>;
@@ -28,7 +31,10 @@ export default async function ArchiveRacePage({ params, searchParams }: Props) {
   const index = typeof sesion === 'string' && /^\d+$/.test(sesion) ? Number(sesion) : 0;
   const active = sessions.find((session) => session.index === index) ?? sessions[0];
   const table = active?.table;
+  const f1Sessions = categoria === 'f1' ? await getEventSessions(year,event.id) : [];
+  const f1Session = f1Sessions.find((session)=>table?.id === `openf1:${session.key}`) ?? f1Sessions.at(-1);
   const source = sources[categoria];
+  const tableSourceName=table?.id?.startsWith('openf1:')?(table.name.endsWith('· Estado')?'Fórmula 1':'OpenF1'):source.name;
   const driverColumn = table?.columns.indexOf('Piloto') ?? -1;
   const podium = table && driverColumn >= 0 && /^(carrera|final)\b/i.test(table.name) && !/parciales/i.test(table.name)
     ? table.rows.filter(([position]) => /^[123]°?$/.test(String(position))).slice(0, 3)
@@ -41,6 +47,7 @@ export default async function ArchiveRacePage({ params, searchParams }: Props) {
       <SectionHero category={categoria} title={event.name} subtitle={`Fecha ${event.round} · ${formatDate(event.date)} ${year}${event.venue ? ` · ${event.venue}` : ''}`} />
       <DataFreshness category={categoria} year={year} />
       <EventActions hasResults={event.tables.length > 0} event={{ key: `${categoria}:${year}:${event.id}`, category: categoria, year, id: event.id, name: event.name, date: event.date }} />
+      <WakeLockControl />
       <nav className="adjacent-events" aria-label="Otras fechas">
         {season?.events[season.events.indexOf(event) - 1] ? <Link href={`/categoria/${categoria}/archivo/${year}/${season.events[season.events.indexOf(event) - 1].id}`}>Fecha anterior</Link> : <span />}
         {season?.events[season.events.indexOf(event) + 1] ? <Link href={`/categoria/${categoria}/archivo/${year}/${season.events[season.events.indexOf(event) + 1].id}`}>Fecha siguiente</Link> : null}
@@ -77,8 +84,9 @@ export default async function ArchiveRacePage({ params, searchParams }: Props) {
           </ul>
         </section>
       ) : null}
+      {f1Session ? <F1Analysis key={f1Session.key} session={f1Session} /> : null}
       <VideoSection category={categoria} event={{ year: Number(year), id: event.id }} />
-      <p className="archive-credit">Datos de <a href={table?.sourceUrl ?? (event.winner && categoria === 'tc' ? 'https://actc.org.ar/institucional/ganadores' : source.url)} target="_blank" rel="noreferrer">{source.name}</a>{categoria === 'f1' ? ' · Datos adaptados al formato de Tiempos de Pista.' : '.'}</p>
+      <p className="archive-credit">Datos de <a href={table?.sourceUrl ?? (event.winner && categoria === 'tc' ? 'https://actc.org.ar/institucional/ganadores' : source.url)} target="_blank" rel="noreferrer">{tableSourceName}</a>{categoria === 'f1' ? ' · Datos adaptados al formato de Tiempos de Pista.' : '.'}</p>
     </>
   );
 }

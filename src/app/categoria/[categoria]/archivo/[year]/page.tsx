@@ -7,6 +7,7 @@ import { argentinaDate } from '@/lib/dates';
 import { isCategory } from '@/lib/racing';
 import { F1Guide } from '@/components/f1-guide';
 import { DataFreshness } from '@/components/data-freshness';
+import { orderCalendar } from '@/lib/calendar-order';
 
 type Props = {
   params: Promise<{ categoria: string; year: string }>;
@@ -35,7 +36,8 @@ export default async function ArchivePage({ params, searchParams }: Props) {
   };
   const search = typeof query.buscar === 'string' ? query.buscar.slice(0, 80) : '';
   const normalized = normalize(search);
-  const events = season.events.filter((event) => normalize(`${event.name} ${event.venue ?? ''} ${event.winner ?? ''}`).includes(normalized));
+  const calendar=orderCalendar(season.events);
+  const events = calendar.events.filter((event) => normalize(`${event.name} ${event.venue ?? ''} ${event.winner ?? ''}`).includes(normalized));
 
   return (
     <>
@@ -65,10 +67,10 @@ export default async function ArchivePage({ params, searchParams }: Props) {
           {events.length ? (
             <ul className="archive-events">
               {events.map((event) => (
-                <li key={event.id}>
+                <li key={event.id} className={calendar.featured?.id===event.id?'calendar-featured':undefined} aria-current={calendar.featured?.id===event.id?'date':undefined}>
                   <Link href={`/categoria/${categoria}/archivo/${year}/${event.id}`} prefetch={false}>
                     <span className="round-number numeric">{String(event.round).padStart(2, '0')}</span>
-                    <span className="event-main"><strong>{event.name}</strong>{event.winner || event.venue ? <span>{event.winner ? `Ganó ${event.winner}` : event.venue}</span> : null}</span>
+                    <span className="event-main">{calendar.featured?.id===event.id?<span className="current-round-label">{calendar.label}</span>:null}<strong>{event.name}</strong>{event.winner || event.venue ? <span>{event.winner ? `Ganó ${event.winner}` : event.venue}</span> : null}</span>
                     <span className="archive-status">{event.tables.length ? `${event.tables.length} tablas` : event.winner ? 'Ganador registrado' : event.date > argentinaDate() ? 'Programada' : 'Sin resultados'}</span>
                     <RaceDate date={event.date} />
                     <span aria-hidden="true">›</span>

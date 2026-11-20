@@ -1,5 +1,19 @@
 # Verificación de UX, F1 y actualización de datos
 
+## Integraciones de v1.1.0 · 20 de noviembre de 2026
+
+Se completaron resultados y análisis de sesiones F1 terminadas, logos de once escuderías 2026, calendario destacado/descendente, tema claro persistente y Wake Lock voluntario. La versión de package y lockfile es 1.1.0.
+
+- Compilación PWA de producción, TypeScript y lint aprobados. 33 pruebas unitarias y 22 pruebas Playwright aprobadas en escritorio y móvil. El ajuste visual posterior de los ejes se recompiló y repitió sus dos pruebas de comparación, lint y verificación visual con datos reales.
+- Las Vegas FP2: clasificación con 22 pilotos y 413 registros de vueltas. FP1: 20 registros de vueltas y estado oficial sin tiempos cronometrados, sin inventar clasificación.
+- Endpoint propio con datos reales: Russell, FP2, vuelta 20, HTTP 200 y 381 muestras; primera consulta medida en 904 ms y segunda en 9 ms mediante caché local validada. Son mediciones puntuales, no garantías de latencia del hosting. FP1, auto 51, HTTP 200 con 221 muestras y actividad superior a 100 km/h.
+- Los cinco gráficos se renderizaron con datos reales sin errores de JavaScript. La vista de 360 px no desbordó horizontalmente; los ejes usan texto HTML que conserva tamaño legible al reducir el SVG. Capturas en `.work-import/previews` no versionadas.
+- Los once logos locales cargaron. Axe no encontró infracciones en las vistas revisadas de ambos temas. La preferencia clara sobrevivió una recarga; el lector sin conexión también hereda esa elección.
+- Wake Lock se probó con API controlada: adquisición, liberación al ocultar, recuperación al volver, liberación al navegar y rechazo por el dispositivo. Falta comprobar el comportamiento en teléfonos físicos y sus modos de ahorro de batería.
+- Una segunda importación OpenF1 no cambió el índice ni las revisiones. El workflow integra su consulta/publicación; clasificaciones parciales, datos de otra sesión y valores inválidos se rechazan por pruebas. No se activó ni contrató acceso en vivo.
+
+La telemetría es de sesiones importadas, por selección y con conexión. No se afirma haber importado todo el histórico OpenF1 desde 2023 ni ofrecer cronometraje en vivo. El archivo histórico F1DB se conserva.
+
 ## Entrega inicial de v1.1.0 · 20 de noviembre de 2026
 
 Home editorial general y centros separados de F1, TC y TN, noticias breves internas y cinco resúmenes oficiales importados (tres F1, uno TC y uno TN). La asociación de las prácticas 2026 de Las Vegas no incluye el resumen histórico de 2025 publicado esta semana.

@@ -6,7 +6,7 @@ import { CompetitionLogo } from '@/components/racing-ui';
 import { DataFreshness } from '@/components/data-freshness';
 
 const scope = {
-  f1: 'Las sesiones y estadísticas disponibles en la versión publicada de F1DB. Las fechas futuras pueden tener cronograma sin resultados. Los datos se adaptaron a las tablas del sitio y se distribuyen bajo CC BY 4.0.',
+  f1: 'F1DB aporta las sesiones y estadísticas de su archivo histórico bajo CC BY 4.0. OpenF1 agrega las sesiones terminadas que importamos durante el fin de semana, con clasificación, vueltas y telemetría. La telemetría de OpenF1 existe desde 2023; su disponibilidad aquí corresponde a las sesiones importadas, no a todas las temporadas del archivo.',
   tc: 'Clasificaciones de sesión de 2026, campeonatos desde 2010 y ganadores históricos desde 1937. Hay fechas que conservan el ganador sin clasificación completa. Las tablas detalladas anteriores a 2026 están pendientes.',
   tn: 'Tablas de clases 2 y 3 disponibles en el archivo HTML de APAT desde 2003. Las posiciones históricas y el registro de campeones tienen cobertura parcial.',
 };
@@ -32,6 +32,6 @@ export default async function CoveragePage() {
         </section>;
       })}
     </div>
-    <section className="panel event-schedule"><div className="section-heading"><h2>Cómo se actualizan los resultados</h2></div><p className="empty">El actualizador consulta las fuentes durante las ventanas de actividad del calendario. Si falta una final, reintenta durante los dos días siguientes. Una respuesta incompleta o bloqueada conserva los resultados anteriores. La última consulta y la última publicación se registran por separado.</p><p className="empty">F1DB publica versiones después de las carreras. La disponibilidad de cada sesión depende del proveedor. La web no ofrece cronometraje en vivo. Los retratos de F1 provienen de las imágenes identificadas por OpenF1 en la CDN de Formula 1; se muestran iniciales cuando no hay un retrato identificado.</p></section>
+    <section className="panel event-schedule"><div className="section-heading"><h2>Cómo se actualizan los resultados</h2></div><p className="empty">El actualizador consulta las fuentes durante las ventanas de actividad del calendario. Si falta una final, reintenta durante los dos días siguientes. Una respuesta incompleta o bloqueada conserva los resultados anteriores. La última consulta y la última publicación se registran por separado.</p><p className="empty">F1DB publica versiones después de las carreras. OpenF1 se consulta desde 30 minutos después del final de cada sesión, con la demora adicional del actualizador y del proveedor. La web ofrece análisis de sesiones finalizadas y no cronometraje en vivo. Cada tabla identifica su fuente; una sesión sin tiempos requiere confirmación oficial.</p><p className="empty">Los retratos y los logos de escuderías 2026 provienen de la CDN oficial de Fórmula 1 y se sirven localmente. Cuando falta un retrato identificado se muestran iniciales. Las marcas pertenecen a sus respectivos titulares; este es un proyecto independiente.</p></section>
   </>;
 }

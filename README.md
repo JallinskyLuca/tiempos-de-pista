@@ -1,10 +1,14 @@
 # Tiempos de Pista
 
-Primera entrega de la evolución [v1.1.0](docs/V1.1.0.md): Home general, centros propios en `/categoria/f1`, `/categoria/tc` y `/categoria/tn`, breves editoriales con lectura interna y biblioteca de resúmenes oficiales. El resto de los bloques sigue en desarrollo; no se ha etiquetado la versión final.
+[v1.1.0](docs/V1.1.0.md): Home general y centros de F1/TC/TN, noticias breves y resúmenes oficiales, sesiones terminadas de OpenF1 con análisis de telemetría, once logos de escuderías 2026, calendario con fecha destacada, temas claro/oscuro persistentes y control voluntario de pantalla encendida.
 
 `npm run media:update` consulta los feeds públicos de FORMULA 1, ACTC Argentina y TN APAT, verifica canal/identificador/año y conserva hasta 60 resúmenes por competencia. Los errores no borran la biblioteca previa. La tarea alojada lo ejecuta durante las ventanas de actividad junto con la actualización de resultados; las visitas no consultan YouTube para construir las páginas. El reproductor `youtube-nocookie.com` se carga solo al pulsar **Cargar video**. Las restricciones del titular o de la región pueden impedir reproducir un video; el acceso al original queda disponible.
 
-Las noticias iniciales son breves propios revisados, con fuente primaria; no constituyen un feed automático de noticias. La integración de resultados/telemetría por sesión está diseñada en [OPENF1.md](docs/OPENF1.md): el vivo es pago y la consulta histórica gratuita queda disponible fuera de la ventana de sesión.
+Las noticias iniciales son breves propios revisados, con fuente primaria; no constituyen un feed automático de noticias. La integración de resultados/telemetría está documentada en [OPENF1.md](docs/OPENF1.md): el vivo es pago y la consulta histórica gratuita queda disponible fuera de la ventana de sesión.
+
+`npm run f1:update` importa las sesiones finalizadas desde hace al menos 30 minutos de las fechas cercanas al día actual. `npm run f1:update -- --year=2026 --round=21` permite consultar una fecha específica desde 2023. Conserva sesiones inmutables y publica su índice solo al validar la tanda completa. Una clasificación parcial, un resultado 404 sin confirmación oficial o una pérdida de vueltas impiden reemplazar datos válidos. El workflow alojado ejecuta esta importación durante las ventanas de actividad y despliega solo ante cambios reales.
+
+La telemetría se pide por piloto/vuelta desde un endpoint propio, con intervalos de hasta 180 segundos. Solo las respuestas validadas se guardan en caché compartida y CDN; una cola local y límites de solicitudes reducen la presión sobre OpenF1. El proveedor aún puede responder con límites o muestras no disponibles. El gráfico compara segundos transcurridos, no distancia. Las tablas importadas pueden guardarse sin conexión; la telemetría requiere red. El archivo histórico de F1DB continúa disponible; no se atribuye telemetría a temporadas o sesiones que no la ofrecen.
 
 Agenda, resultados y archivo histórico de Turismo Carretera, Fórmula 1 y TN APAT. Incluye favoritos locales, exportación a calendario y una PWA con descarga explícita de fechas completas para consultar sin conexión.
 

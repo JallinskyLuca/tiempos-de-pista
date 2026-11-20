@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import type { ArchiveTable, F1Entities } from '@/lib/archive';
 import { DriverAvatar } from './driver-avatar';
+import { TeamLogo } from './team-logo';
 
 const normalize = (value: string | number) => String(value).normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
 
@@ -50,7 +51,7 @@ export function DataTable({ table, id, embedded = false, f1, year }: { table: Ar
                   const numeric = /^(pos|p$|n[.°ºr]|tiempo|dif|puntos|vueltas|vtas|[qs]q?\d|\d{2}\/)/i.test(table.columns[index]);
                   const driver = table.columns[index] === 'Piloto' ? f1?.drivers.find((driver) => driver.id === entity?.driverId) : null;
                   const team = table.columns[index] === 'Equipo' ? f1?.teams.find((team) => team.id === entity?.constructorId) : null;
-                  const content = driver && year ? <Link className="table-person" href={`/f1/${year}/piloto/${driver.id}`}><DriverAvatar name={driver.name} photo={driver.photo} /><span>{cell}</span></Link> : team && year ? <Link className="table-team" href={`/f1/${year}/escuderia/${team.id}`}><span className="team-dot" aria-hidden="true" style={{ backgroundColor: team.color }} />{cell}</Link> : cell === '' ? '—' : cell;
+                  const content = driver && year ? <Link className="table-person" href={`/f1/${year}/piloto/${driver.id}`}><DriverAvatar name={driver.name} photo={driver.photo} /><span>{cell}</span></Link> : team && year ? <Link className="table-team" href={`/f1/${year}/escuderia/${team.id}`}><TeamLogo id={team.id} year={year}/><span className="team-dot" aria-hidden="true" style={{ backgroundColor: team.color }} />{cell}</Link> : cell === '' ? '—' : cell;
                   return index === identity
                     ? <th className="driver-cell" key={index} scope="row">{content}</th>
                     : <td key={index} className={numeric ? 'numeric' : undefined}>{content}</td>;

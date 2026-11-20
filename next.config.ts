@@ -13,6 +13,8 @@ const publishedFiles = ['f1', 'tc', 'tn'].flatMap((category) => {
   })];
 });
 const activeFiles = new Set(publishedFiles);
+const sessionIndex=JSON.parse(readFileSync('./data/openf1/index.json','utf8')) as {sessions:{file:string}[]};
+const sessionFiles=sessionIndex.sessions.map((entry)=>{if(!/^[a-f\d]{64}$/.test(entry.file))throw new Error('Referencia OpenF1 inválida.');return `./data/openf1/sessions/${entry.file}.json`;});
 const retiredFiles = ['f1', 'tc', 'tn'].flatMap((category) => {
   const directory = `./data/archive/${category}/`;
   return [directory, directory + 'revisions/'].flatMap((path) => existsSync(path) ? readdirSync(path).filter((name) => name.endsWith('.json')).map((name) => path + name) : []);
@@ -23,7 +25,7 @@ const config: NextConfig = {
   poweredByHeader: false,
   distDir: process.env.TIEMPOS_BUILD_DIR || '.next',
   outputFileTracingIncludes: {
-    '/*': [...publishedFiles, './data/sync/status.json'],
+    '/*': [...publishedFiles, './data/sync/status.json', './data/openf1/index.json', ...sessionFiles],
   },
   outputFileTracingExcludes: {
     '/*': retiredFiles,
@@ -35,7 +37,7 @@ const config: NextConfig = {
         { key: 'X-Content-Type-Options', value: 'nosniff' },
         { key: 'X-Frame-Options', value: 'DENY' },
         { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-        { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+        { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), screen-wake-lock=(self)' },
       ],
     }, {
       source: '/sw.js',

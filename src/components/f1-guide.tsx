@@ -2,13 +2,14 @@ import Link from 'next/link';
 import type { CSSProperties } from 'react';
 import type { ArchiveEvent, F1Entities } from '@/lib/archive';
 import { DriverAvatar } from './driver-avatar';
+import { TeamLogo } from './team-logo';
 
 export function F1Guide({ entities, year }: { entities: F1Entities; year: string }) {
   return <section aria-labelledby="f1-grid">
     <div className="content-heading"><div><h2 id="f1-grid">La grilla de {year}</h2><p>{entities.teams.length} escuderías. Pilotos y marcas registrados en esta temporada.</p></div><a className="button button-secondary" href="#lista-pilotos">Ver todos los pilotos</a></div>
     <div className="teams-grid">
       {entities.teams.map((team) => <article className="team-card" key={team.id} style={{ '--team-color': team.color } as CSSProperties}>
-        <header><div><span className="team-position">{team.position ? `${team.position}° en el campeonato` : 'Sin posición registrada'}</span><h3><Link href={`/f1/${year}/escuderia/${team.id}`}>{team.name}</Link></h3></div><strong className="team-points numeric">{team.points}<small>puntos</small></strong></header>
+        <header><TeamLogo id={team.id} year={year}/><div><span className="team-position">{team.position ? `${team.position}° en el campeonato` : 'Sin posición registrada'}</span><h3><Link href={`/f1/${year}/escuderia/${team.id}`}>{team.name}</Link></h3></div><strong className="team-points numeric">{team.points}<small>puntos</small></strong></header>
         <dl className="team-facts"><div><dt>Motor</dt><dd>{team.engines.join(' / ') || 'Sin registro'}</dd></div><div><dt>Chasis</dt><dd>{team.chassis.join(' / ') || 'Sin registro'}</dd></div></dl>
         <ul className="team-drivers">{team.drivers.map((id) => {
           const driver = entities.drivers.find((driver) => driver.id === id);

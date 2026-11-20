@@ -29,6 +29,10 @@ Se revisó el diseño contra la consigna: se conservan el fondo oscuro y las tab
 
 ## Datos visibles
 
+La v1.1.0 agrega un tema claro de fondo `#f1f5fa`, superficie blanca, texto `#172638`, secundario `#40546c` y acción `#155b8a`. Mantiene oscuro por defecto y la elección local se aplica en el head antes de la interfaz. Los logos blancos oficiales llevan fondo oscuro en ambos temas. La tabla de fechas destaca la actual/próxima y ordena el resto en sentido descendente.
+
+Los gráficos de telemetría usan SVG liviano y comparan tiempo transcurrido: línea continua para la vuelta principal y punteada para la comparación. La selección no consulta al proveedor hasta pulsar la acción; valores ausentes interrumpen el trazo y permanecen como faltantes en la tabla. Wake Lock se solicita para la página de fecha y se libera al ocultar o abandonar esa vista.
+
 ## Portada y centros de categoría · v1.1.0
 
 Se conserva el sistema asfalto `#0b1018`, boxes `#162233`, texto `#f4f7fb`, acero `#bdcadb`, celeste `#a4e2ff` y borde `#7a91ac`. Barlow Condensed identifica titulares; sistema nativo para noticias y controles. Todo alineado a la izquierda.

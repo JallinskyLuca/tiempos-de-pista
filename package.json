@@ -1,6 +1,6 @@
 {
   "name": "tiempos-de-pista",
-  "version": "0.1.0",
+  "version": "1.1.0",
   "private": true,
   "engines": {
     "node": ">=24 <25"
@@ -19,7 +19,8 @@
     "import:tn": "node scripts/import-national.mjs tn --current",
     "data:update": "node scripts/update-data.mjs",
     "data:watch": "node scripts/data-worker.mjs",
-    "media:update": "node scripts/import-videos.mjs"
+    "media:update": "node scripts/import-videos.mjs",
+    "f1:update": "node scripts/import-openf1.mjs"
   },
   "dependencies": {
     "@fontsource/barlow-condensed": "5.2.8",

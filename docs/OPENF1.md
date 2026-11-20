@@ -2,6 +2,16 @@
 
 Investigación delegada y verificada el 20 de noviembre de 2026, sin autenticación ni modificaciones a la aplicación.
 
+## Integración implementada en v1.1.0
+
+`scripts/import-openf1.mjs` consulta sesiones de la temporada, las vincula a la agenda publicada y espera `date_end + 30 minutos`. Descarga clasificación, pilotos y vueltas, valida la tanda y publica un índice atómico de revisiones inmutables. Una segunda consulta de FP1/FP2 de Las Vegas conservó la revisión existente. El workflow de GitHub incorpora las sesiones junto con los demás datos y el aviso de nuevas revisiones también las detecta.
+
+El archivo unificado y su API de descarga incluyen las tablas OpenF1. El selector de sesión abre FP1 como estado confirmado y FP2 como clasificación completa; el análisis sigue la sesión elegida. Se ofrece telemetría por piloto/vuelta, comparación por tiempo transcurrido, cinco gráficos SVG y tabla completa de muestras. El endpoint propio permite exclusivamente combinaciones importadas, limita el intervalo a 180 segundos y valida proveedor, sesión, piloto, tamaño y rangos. La mejor vuelta de Russell en FP2 devolvió 381 muestras reales.
+
+El caché de Next almacena solo datos normalizados válidos durante 24 horas; la respuesta pública tiene caché de CDN y permite reutilizar datos anteriores mientras revalida. Las peticiones concurrentes idénticas comparten trabajo en la instancia. La cola por instancia admite dos consultas distintas y separa accesos al proveedor por 2.2 segundos; no constituye un límite global entre todas las instancias del hosting. Las limitaciones externas se muestran sin inventar muestras.
+
+Los filtros de tiempo de la URL usan claves `date>` y `date<`: el signo `=` es el separador de la query, no parte de la clave. Se verificó ese contrato contra la API real. El acceso en vivo sigue sin activarse ni contratarse. No se ha importado todo el histórico de telemetría desde 2023; el archivo consolidado anterior de F1DB sigue conservándose.
+
 ## Acceso y costo
 
 [OpenF1](https://openf1.org/) publica histórico gratuito desde 2023. El intervalo en vivo comprende desde 30 minutos antes hasta 30 minutos después de cada sesión; el acceso en vivo requiere suscripción, publicada a €9,90/mes en esta consulta. El plan gratuito permite 3 solicitudes por segundo y 30 por minuto. Condiciones y precios pueden cambiar; verificar antes de activar una integración de pago o comercial.

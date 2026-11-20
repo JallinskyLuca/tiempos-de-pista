@@ -1,4 +1,10 @@
 :root { color-scheme:dark; font:16px/1.5 system-ui,sans-serif; color:#edf3f9; background:#0b1018; }
+:root[data-theme="light"] { color-scheme:light; color:#172638; background:#f1f5fa; }
+:root[data-theme="light"] a { color:#155b8a; }
+:root[data-theme="light"] nav a,:root[data-theme="light"] button { color:#172638; background:#e4edf7; border-color:#60748a; }
+:root[data-theme="light"] button[aria-pressed="true"] { color:#155b8a; border-color:#155b8a; }
+:root[data-theme="light"] section { background:#ffffff; border-color:#c3cedc; }
+:root[data-theme="light"] thead,:root[data-theme="light"] .offline-meta { color:#40546c; }
 * { box-sizing:border-box; }
 body { margin:0; }
 header,main { width:min(1100px,calc(100% - 28px)); margin:auto; }
