@@ -10,6 +10,8 @@ Se comprobó que la Home no solicita YouTube, ytimg ni googlevideo antes de una 
 
 La investigación de OpenF1 verificó resultados FP2 y muestras reales de telemetría de FP1/FP2 sin autenticación. [OPENF1.md](OPENF1.md) registra claves, fuentes y validaciones necesarias; no se presenta esa investigación como una integración ya implementada.
 
+La aplicación del commit `5f7615b` quedó publicada en Netlify el 20/11/2026 a las 23:15 UTC, despliegue `6b00d47196755c9d745b3ce2`, estado `ready`. Las 14 pruebas Playwright pasaron contra el dominio HTTPS público después de ajustar los selectores de iframe al reproductor de la aplicación: la página alojada incluye un iframe adicional ajeno al reproductor. Se mantiene la comprobación de cero solicitudes a YouTube antes de pulsar. GitHub CI también terminó correctamente para ese commit. Una segunda importación de videos conservó exactamente la misma huella SHA-256 de la biblioteca, evitando publicaciones vacías.
+
 19 de noviembre de 2026. Entorno local Windows, Node.js 24, Next.js 16.4.6. Producción compilada con Webpack y Serwist; desarrollo con Turbopack.
 
 ## Resultado comprobado
