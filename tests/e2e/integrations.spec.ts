@@ -3,6 +3,8 @@ import {expect,test} from '@playwright/test';
 
 test('las copias de telemetría se sirven desde el propio CDN sin depender del acceso a OpenF1',async({request})=>{
   for(const [session,driver,lap] of [[11414,63,20],[11413,51,1]]){
+    const selected=await request.get(`/api/f1/telemetria/${session}?piloto=${driver}&vuelta=${lap}`,{maxRedirects:0});
+    expect(selected.status()).toBe(307);expect(selected.headers()['cache-control']).toContain('no-store');
     const response=await request.get(`/api/f1/telemetria/${session}?piloto=${driver}&vuelta=${lap}`);
     expect(response.status()).toBe(200);
     expect(new URL(response.url()).pathname).toMatch(/^\/telemetria\/[a-f\d]{64}\.json$/);
@@ -28,9 +30,11 @@ test('Las Vegas muestra FP2 completa y distingue FP1 sin tiempos oficiales',asyn
 
 test('telemetría bajo demanda, comparación y cancelación al cambiar vuelta',async({page})=>{
   let calls=0;
+  let wrongCopy=false;
   await page.route('**/api/f1/telemetria/**',async(route)=>{
     calls++;
-    await route.fulfill({json:{points:[{t:0,speed:100,throttle:50,brake:0,gear:3,rpm:7000},{t:1,speed:150,throttle:80,brake:null,gear:4,rpm:9000}],window:{from:'2026-11-20T04:10Z',to:'2026-11-20T04:11Z',truncated:false}}});
+    const url=new URL(route.request().url());
+    await route.fulfill({json:{session:Number(url.pathname.split('/').at(-1)),driver:wrongCopy?999:Number(url.searchParams.get('piloto')),lap:Number(url.searchParams.get('vuelta')),points:[{t:0,speed:100,throttle:50,brake:0,gear:3,rpm:7000},{t:1,speed:150,throttle:80,brake:null,gear:4,rpm:9000}],window:{from:'2026-11-20T04:10Z',to:'2026-11-20T04:11Z',truncated:false}}});
   });
   await page.goto('/categoria/f1/archivo/2026/21');
   await expect(page.getByRole('heading',{name:'Telemetría · Libres 2'})).toBeVisible();
@@ -42,6 +46,11 @@ test('telemetría bajo demanda, comparación y cancelación al cambiar vuelta',a
   await page.getByText(/Ver todas las muestras/).click();
   await expect(page.locator('.f1-analysis table tbody tr')).toHaveCount(2);
   await page.getByLabel('Vuelta',{exact:true}).selectOption('2');
+  await expect(page.locator('.telemetry-chart')).toHaveCount(0);
+  wrongCopy=true;
+  await page.getByLabel('Vuelta',{exact:true}).selectOption('20');
+  await page.getByRole('button',{name:'Cargar telemetría'}).click();
+  await expect(page.locator('.f1-analysis [role="status"]')).toContainText('no corresponde a la vuelta elegida');
   await expect(page.locator('.telemetry-chart')).toHaveCount(0);
 });
 

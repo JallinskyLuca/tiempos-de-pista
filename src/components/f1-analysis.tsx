@@ -33,7 +33,7 @@ export function F1Analysis({ session,available }:{session:F1Session;available:{d
   async function load() {
     controller.current?.abort();const active=new AbortController();controller.current=active;
     setBusy(true);setStatus('Cargando la copia sincronizada de telemetría…');
-    const read=async(number:number,lap:number):Promise<Sample>=>{const response=await fetch(`/api/f1/telemetria/${session.key}?piloto=${number}&vuelta=${lap}`,{signal:active.signal});const body=await response.json();if(!response.ok)throw new Error(body.error);return body;};
+    const read=async(number:number,lap:number):Promise<Sample>=>{const response=await fetch(`/api/f1/telemetria/${session.key}?piloto=${number}&vuelta=${lap}`,{signal:active.signal});const body=await response.json();if(!response.ok)throw new Error(body.error);if(body.session!==session.key || body.driver!==number || body.lap!==lap || !Array.isArray(body.points))throw new Error('La copia recibida no corresponde a la vuelta elegida. Volvé a intentar.');return body;};
     try { const a=await read(driver,lap);const b=other?await read(other,otherLap):null;if(active.signal.aborted)return;setData(a);setComparison(b);setStatus('Telemetría cargada. El eje horizontal muestra segundos desde el inicio del intervalo.'); }
     catch(error){if(!active.signal.aborted)setStatus(error instanceof Error?error.message:'No se pudo cargar la telemetría.');}
     finally{if(!active.signal.aborted)setBusy(false);}

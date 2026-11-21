@@ -10,6 +10,8 @@ La telemetría devolvió 401 global desde OpenF1 al comenzar la ventana de FP3 a
 
 La versión corregida pasó compilación de producción, TypeScript, lint, 36 pruebas unitarias y las 22 pruebas de navegador existentes localmente. Una prueba adicional de CDN verifica ambas copias, sus identificadores, rangos y cabeceras inmutables. La pausa de ambos importadores se comprobó sin consultar el proveedor durante la ventana cerrada. La primera ingestión amplia queda pendiente de la reapertura de la fuente; el algoritmo de división por vueltas y la conservación de identidad se verifican con fixtures.
 
+La revisión pública adicional detectó que el CDN compartía una redirección cacheada entre valores distintos de query. La selección por sesión/piloto/vuelta ahora usa `no-store` tanto para navegador como para Netlify CDN; solo se cachea el JSON identificado por hash. La redirección es relativa para conservar el dominio visible y el cliente verifica también sesión, piloto y vuelta del cuerpo antes de dibujar. La prueba de identidad rechaza una respuesta que pertenece a otro piloto.
+
 Se completaron resultados y análisis de sesiones F1 terminadas, logos de once escuderías 2026, calendario destacado/descendente, tema claro persistente y Wake Lock voluntario. La versión de package y lockfile es 1.1.0.
 
 - Compilación PWA de producción, TypeScript y lint aprobados. 33 pruebas unitarias y 22 pruebas Playwright aprobadas en escritorio y móvil. El ajuste visual posterior de los ejes se recompiló y repitió sus dos pruebas de comparación, lint y verificación visual con datos reales.
