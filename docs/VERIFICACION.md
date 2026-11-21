@@ -8,6 +8,8 @@ El despliegue de datos `6b00ffb7f16c14c1218c9a72` se observó listo. El dominio 
 
 Se agregó selección por identificador estable `openf1:<session_key>`, manteniendo los índices numéricos anteriores como compatibilidad. Un test controla que agregar FP3 no reasigne un enlace de FP2. Las pruebas de navegador ahora eligen FP2 de forma explícita, verifican FP3, y comprueban que FP1 conserve su identidad al recargar. Compilación PWA, TypeScript, 37 pruebas unitarias y 24 pruebas de navegador locales aprobadas con los datos nuevos. La comprobación pública del selector se registra tras su despliegue.
 
+El commit de aplicación `b24576f` quedó publicado en el despliegue Netlify `6b01014321873aa5a9c458b9`, observado en estado `ready` a las 23:27 AR del 20/11. Las 24 pruebas Playwright también pasaron contra el dominio HTTPS publicado, con FP3, FP2, FP1, caché por identidad, temas, accesibilidad y cierre/reapertura sin conexión. GitHub CI terminó correctamente. La comparación real de FP3 entre Russell y Antonelli mostró los cinco gráficos y sus cinco líneas de comparación, cero errores de JavaScript y ningún desbordamiento a 360 px. Se cierra la verificación pública pendiente de v1.1.0; la prueba en teléfonos físicos sigue pendiente.
+
 ## Integraciones de v1.1.0 · 20 de noviembre de 2026
 
 ### Ajustes detectados en la publicación
