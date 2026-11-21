@@ -4,6 +4,7 @@ import { setTimeout } from 'node:timers/promises';
 import { atomicJson } from './atomic-json.mjs';
 import { readPublished } from './published.mjs';
 import { historicalSession, normalizeSession } from './openf1-model.mjs';
+import { freeAccessWindow } from './openf1-access.mjs';
 
 const root = new URL('../data/openf1/', import.meta.url);
 const now = new Date();
@@ -11,6 +12,8 @@ const year = Number(process.argv.find((arg) => arg.startsWith('--year='))?.split
 if (!Number.isInteger(year) || year < 2023 || year > now.getUTCFullYear()) throw new Error('Año OpenF1 inválido.');
 const round = process.argv.find((arg) => arg.startsWith('--round='))?.split('=')[1];
 const season = await readPublished('f1', year);
+const access=freeAccessWindow(season?.events??[],now);
+if(!access.allowed){console.log(`OpenF1: pausa global de acceso gratuito hasta ${access.retryAt}. Se conserva la edición publicada.`);process.exit(0);}
 const events = season?.events.filter((event) => round ? String(event.round) === round : Math.abs(Date.parse(event.date) - now.getTime()) < 7 * 86_400_000) ?? [];
 if (!events.length) { console.log('OpenF1: no hay una fecha para consultar.'); process.exit(0); }
 const previous = JSON.parse(await readFile(new URL('index.json', root), 'utf8'));

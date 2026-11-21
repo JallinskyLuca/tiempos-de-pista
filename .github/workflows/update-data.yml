@@ -42,19 +42,24 @@ jobs:
         id: sessions
         continue-on-error: true
         run: npm run f1:update
+      - name: Preparar telemetría durante el acceso gratuito
+        if: steps.calendar.outputs.active == 'true'
+        id: telemetry
+        continue-on-error: true
+        run: npm run telemetry:update
       - name: Publicar solo cuando cambian los datos
         if: steps.calendar.outputs.active == 'true'
         shell: bash
         run: |
-          if git diff --quiet -- data/archive data/openf1 data/media data/f1-media.json public/pilotos && [ "$(node scripts/health-change.mjs)" = "false" ]; then
+          if git diff --quiet -- data/archive data/openf1 data/media data/f1-media.json public/pilotos public/telemetria && [ "$(node scripts/health-change.mjs)" = "false" ]; then
             echo "Las fuentes no publicaron nuevos resultados."
             exit 0
           fi
           git config user.name "Tiempos de Pista"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/archive data/openf1 data/media data/f1-media.json public/pilotos data/sync
+          git add data/archive data/openf1 data/media data/f1-media.json public/pilotos public/telemetria data/sync
           git commit -m "Actualizar resultados publicados por las fuentes"
           git push
       - name: Informar fallas de proveedores
-        if: steps.import.outcome == 'failure' || steps.media.outcome == 'failure' || steps.sessions.outcome == 'failure'
+        if: steps.import.outcome == 'failure' || steps.media.outcome == 'failure' || steps.sessions.outcome == 'failure' || steps.telemetry.outcome == 'failure'
         run: exit 1

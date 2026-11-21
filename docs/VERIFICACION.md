@@ -2,6 +2,14 @@
 
 ## Integraciones de v1.1.0 · 20 de noviembre de 2026
 
+### Ajustes detectados en la publicación
+
+La primera comprobación de Netlify detectó dos problemas que no se veían localmente. El comentario de hosting que Netlify inserta en el head causaba hidratación React #418 y eliminaba la preferencia del tema. Se aisló quitando únicamente ese comentario en una prueba controlada: desapareció el error. El inicializador del tema se movió al comienzo del body, antes del contenido; la prueba ahora reproduce ese comentario también en CI y verifica persistencia sin errores.
+
+La telemetría devolvió 401 global desde OpenF1 al comenzar la ventana de FP3 a las 21:00 AR, incluyendo las sesiones históricas. Se corrigió la investigación inicial y se cambió a ingestión anticipada con copias estáticas propias. Se conservaron legítimamente 381 muestras de Russell FP2/vuelta 20 y 221 del auto 51 FP1/vuelta 1, capturadas antes del bloqueo. El endpoint sirve esas copias desde el propio CDN incluso con OpenF1 restringido. Las demás vueltas se muestran pendientes hasta una sincronización gratuita; no se activó el plan pago ni se intentó evadir el 401.
+
+La versión corregida pasó compilación de producción, TypeScript, lint, 36 pruebas unitarias y las 22 pruebas de navegador existentes localmente. Una prueba adicional de CDN verifica ambas copias, sus identificadores, rangos y cabeceras inmutables. La pausa de ambos importadores se comprobó sin consultar el proveedor durante la ventana cerrada. La primera ingestión amplia queda pendiente de la reapertura de la fuente; el algoritmo de división por vueltas y la conservación de identidad se verifican con fixtures.
+
 Se completaron resultados y análisis de sesiones F1 terminadas, logos de once escuderías 2026, calendario destacado/descendente, tema claro persistente y Wake Lock voluntario. La versión de package y lockfile es 1.1.0.
 
 - Compilación PWA de producción, TypeScript y lint aprobados. 33 pruebas unitarias y 22 pruebas Playwright aprobadas en escritorio y móvil. El ajuste visual posterior de los ejes se recompiló y repitió sus dos pruebas de comparación, lint y verificación visual con datos reales.

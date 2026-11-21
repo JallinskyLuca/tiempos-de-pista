@@ -21,8 +21,8 @@ export const viewport: Viewport = { themeColor: '#101722', width: 'device-width'
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="es-AR" suppressHydrationWarning>
-      <head><script id="theme-init" dangerouslySetInnerHTML={{__html:"try{var t=localStorage.getItem('tiempos-theme-v1');document.documentElement.dataset.theme=t==='light'?'light':'dark'}catch{document.documentElement.dataset.theme='dark'}document.addEventListener('DOMContentLoaded',function(){var m=document.querySelector('meta[name=theme-color]');if(m)m.content=document.documentElement.dataset.theme==='light'?'#f1f5fa':'#101722'},{once:true})"}} /></head>
       <body>
+        <script id="theme-init" dangerouslySetInnerHTML={{__html:"try{var t=localStorage.getItem('tiempos-theme-v1');document.documentElement.dataset.theme=t==='light'?'light':'dark'}catch{document.documentElement.dataset.theme='dark'}document.addEventListener('DOMContentLoaded',function(){var m=document.querySelector('meta[name=theme-color]');if(m)m.content=document.documentElement.dataset.theme==='light'?'#f1f5fa':'#101722'},{once:true})"}} />
         <PwaStatus />
         <a className="skip-link" href="#contenido">Saltar al contenido</a>
         <header className="masthead">

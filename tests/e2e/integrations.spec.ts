@@ -1,6 +1,17 @@
 import AxeBuilder from '@axe-core/playwright';
 import {expect,test} from '@playwright/test';
 
+test('las copias de telemetría se sirven desde el propio CDN sin depender del acceso a OpenF1',async({request})=>{
+  for(const [session,driver,lap] of [[11414,63,20],[11413,51,1]]){
+    const response=await request.get(`/api/f1/telemetria/${session}?piloto=${driver}&vuelta=${lap}`);
+    expect(response.status()).toBe(200);
+    expect(new URL(response.url()).pathname).toMatch(/^\/telemetria\/[a-f\d]{64}\.json$/);
+    expect(response.headers()['cache-control']).toContain('immutable');
+    const body=await response.json();expect(body.source).toBe('OpenF1');expect(body.session).toBe(session);expect(body.driver).toBe(driver);expect(body.lap).toBe(lap);expect(body.points.length).toBeGreaterThan(0);
+    expect(body.points.every((p:{throttle:number|null;brake:number|null})=>(p.throttle===null || p.throttle>=0 && p.throttle<=100) && (p.brake===null || p.brake>=0 && p.brake<=100))).toBe(true);
+  }
+});
+
 test('Las Vegas muestra FP2 completa y distingue FP1 sin tiempos oficiales',async({page,request})=>{
   await page.goto('/categoria/f1/archivo/2026/21');
   await expect(page.locator('#resultado h2')).toHaveText('Libres 2 · OpenF1');
@@ -24,7 +35,7 @@ test('telemetría bajo demanda, comparación y cancelación al cambiar vuelta',a
   await page.goto('/categoria/f1/archivo/2026/21');
   await expect(page.getByRole('heading',{name:'Telemetría · Libres 2'})).toBeVisible();
   expect(calls).toBe(0);
-  await page.getByLabel('Comparar con',{exact:true}).selectOption('10');
+  await page.getByLabel('Comparar con',{exact:true}).selectOption('63');
   await page.getByRole('button',{name:'Cargar telemetría'}).click();
   await expect(page.locator('.telemetry-chart')).toHaveCount(5);
   expect(calls).toBe(2);
@@ -36,6 +47,12 @@ test('telemetría bajo demanda, comparación y cancelación al cambiar vuelta',a
 
 test('tema claro persiste, logos actuales y calendario destacado son accesibles',async({page},testInfo)=>{
   if(testInfo.project.name==='mobile')await page.setViewportSize({width:360,height:800});
+  // Reproducir también en CI la inserción de comentarios del CDN de producción.
+  await page.route('**/categoria/f1/archivo/2026?vista=escuderias',async(route)=>{
+    const response=await route.fetch();let body=await response.text();
+    if(body.startsWith('<!DOCTYPE html>') && !body.includes('This site is hosted on Netlify.'))body=body.replace('<meta charSet="utf-8"/>','<meta charSet="utf-8"/>\n<!-- This site is hosted on Netlify. Hosting facts. -->');
+    await route.fulfill({response,body});
+  });
   await page.goto('/categoria/f1/archivo/2026?vista=escuderias');
   await expect(page.locator('.team-card .team-logo img')).toHaveCount(11);
   for(const image of await page.locator('.team-card .team-logo img').all()){await image.scrollIntoViewIfNeeded();await expect.poll(()=>image.evaluate((node)=>(node as HTMLImageElement).complete && (node as HTMLImageElement).naturalWidth>0)).toBe(true);}

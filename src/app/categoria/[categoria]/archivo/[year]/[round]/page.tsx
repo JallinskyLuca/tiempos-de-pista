@@ -12,6 +12,7 @@ import { VideoSection } from '@/components/paddock-content';
 import { getEventSessions } from '@/lib/openf1';
 import { F1Analysis } from '@/components/f1-analysis';
 import { WakeLockControl } from '@/components/wake-lock';
+import { availableTelemetry } from '@/lib/telemetry-archive';
 
 type Props = {
   params: Promise<{ categoria: string; year: string; round: string }>;
@@ -33,6 +34,7 @@ export default async function ArchiveRacePage({ params, searchParams }: Props) {
   const table = active?.table;
   const f1Sessions = categoria === 'f1' ? await getEventSessions(year,event.id) : [];
   const f1Session = f1Sessions.find((session)=>table?.id === `openf1:${session.key}`) ?? f1Sessions.at(-1);
+  const telemetryAvailable=f1Session?await availableTelemetry(f1Session.key):[];
   const source = sources[categoria];
   const tableSourceName=table?.id?.startsWith('openf1:')?(table.name.endsWith('· Estado')?'Fórmula 1':'OpenF1'):source.name;
   const driverColumn = table?.columns.indexOf('Piloto') ?? -1;
@@ -84,7 +86,7 @@ export default async function ArchiveRacePage({ params, searchParams }: Props) {
           </ul>
         </section>
       ) : null}
-      {f1Session ? <F1Analysis key={f1Session.key} session={f1Session} /> : null}
+      {f1Session ? <F1Analysis key={f1Session.key} session={f1Session} available={telemetryAvailable} /> : null}
       <VideoSection category={categoria} event={{ year: Number(year), id: event.id }} />
       <p className="archive-credit">Datos de <a href={table?.sourceUrl ?? (event.winner && categoria === 'tc' ? 'https://actc.org.ar/institucional/ganadores' : source.url)} target="_blank" rel="noreferrer">{tableSourceName}</a>{categoria === 'f1' ? ' · Datos adaptados al formato de Tiempos de Pista.' : '.'}</p>
     </>

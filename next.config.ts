@@ -25,7 +25,7 @@ const config: NextConfig = {
   poweredByHeader: false,
   distDir: process.env.TIEMPOS_BUILD_DIR || '.next',
   outputFileTracingIncludes: {
-    '/*': [...publishedFiles, './data/sync/status.json', './data/openf1/index.json', ...sessionFiles],
+    '/*': [...publishedFiles, './data/sync/status.json', './data/openf1/index.json', './data/openf1/telemetry.json', ...sessionFiles],
   },
   outputFileTracingExcludes: {
     '/*': retiredFiles,
@@ -39,6 +39,9 @@ const config: NextConfig = {
         { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
         { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), screen-wake-lock=(self)' },
       ],
+    }, {
+      source: '/telemetria/:path*',
+      headers: [{ key:'Cache-Control',value:'public, max-age=31536000, immutable' }],
     }, {
       source: '/sw.js',
       headers: [
