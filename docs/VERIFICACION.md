@@ -1,5 +1,13 @@
 # Verificación de UX, F1 y actualización de datos
 
+## Reanudación y sincronización de FP3 · noche del 20 de noviembre de 2026
+
+OpenF1 volvió a admitir consultas gratuitas fuera de la ventana global. La ejecución alojada `44854978194`, iniciada desde GitHub, terminó correctamente y publicó `925d098`: FP3 tiene 22 clasificados y 633 registros de vueltas, además de FP2 (22/413) y FP1 (estado oficial sin tiempos, 20 registros). Se prepararon 1.059 intervalos de telemetría para 60 combinaciones sesión/piloto: 18 FP1, 410 FP2, 631 FP3.
+
+El despliegue de datos `6b00ffb7f16c14c1218c9a72` se observó listo. El dominio público devolvió FP3 con 22 filas y las tres primeras posiciones coincidentes con OpenF1. Una copia de FP3, auto 63/vuelta 2, respondió HTTP 200 con 380 muestras. La selección válida mantiene `no-store`; piloto inexistente devuelve 404 y query no permitida 400. Esto cierra la comprobación pendiente de caché entre pilotos.
+
+Se agregó selección por identificador estable `openf1:<session_key>`, manteniendo los índices numéricos anteriores como compatibilidad. Un test controla que agregar FP3 no reasigne un enlace de FP2. Las pruebas de navegador ahora eligen FP2 de forma explícita, verifican FP3, y comprueban que FP1 conserve su identidad al recargar. Compilación PWA, TypeScript, 37 pruebas unitarias y 24 pruebas de navegador locales aprobadas con los datos nuevos. La comprobación pública del selector se registra tras su despliegue.
+
 ## Integraciones de v1.1.0 · 20 de noviembre de 2026
 
 ### Ajustes detectados en la publicación

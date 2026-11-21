@@ -13,6 +13,7 @@ import { getEventSessions } from '@/lib/openf1';
 import { F1Analysis } from '@/components/f1-analysis';
 import { WakeLockControl } from '@/components/wake-lock';
 import { availableTelemetry } from '@/lib/telemetry-archive';
+import { selectSession, sessionOptionValue } from '@/lib/session-selection';
 
 type Props = {
   params: Promise<{ categoria: string; year: string; round: string }>;
@@ -29,8 +30,7 @@ export default async function ArchiveRacePage({ params, searchParams }: Props) {
   const groups = [...new Set(event.tables.flatMap(({ group }) => group ? [group] : []))];
   const group = groups.find((group) => group === clase) ?? groups[0];
   const sessions = event.tables.map((table, index) => ({ table, index })).filter(({ table }) => !group || table.group === group);
-  const index = typeof sesion === 'string' && /^\d+$/.test(sesion) ? Number(sesion) : 0;
-  const active = sessions.find((session) => session.index === index) ?? sessions[0];
+  const active = selectSession(sessions,sesion);
   const table = active?.table;
   const f1Sessions = categoria === 'f1' ? await getEventSessions(year,event.id) : [];
   const f1Session = f1Sessions.find((session)=>table?.id === `openf1:${session.key}`) ?? f1Sessions.at(-1);
@@ -69,7 +69,7 @@ export default async function ArchiveRacePage({ params, searchParams }: Props) {
               {groups.map((name) => <Link key={name} href={`?clase=${encodeURIComponent(name)}`} aria-current={name === group ? 'page' : undefined}>{name}</Link>)}
             </nav>
           ) : null}
-          <SessionPicker sessions={sessions.map(({ table, index }) => ({ index, name: table.name }))} active={active?.index ?? 0} group={group} />
+          <SessionPicker sessions={sessions.map(({ table, index }) => ({ index, id:table.id, name: table.name }))} active={active?sessionOptionValue({index:active.index,id:active.table.id}):'0'} group={group} />
           <DataTable key={`${group}-${active?.index}`} id="resultado" table={table} f1={season?.f1} year={year} />
         </>
       ) : event.winner ? (

@@ -14,14 +14,21 @@ test('las copias de telemetría se sirven desde el propio CDN sin depender del a
   }
 });
 
-test('Las Vegas muestra FP2 completa y distingue FP1 sin tiempos oficiales',async({page,request})=>{
-  await page.goto('/categoria/f1/archivo/2026/21');
+test('Las Vegas muestra FP3 y FP2 completas y distingue FP1 sin tiempos oficiales',async({page,request})=>{
+  await page.goto('/categoria/f1/archivo/2026/21?sesion=openf1%3A11415');
+  await expect(page.locator('#resultado h2')).toHaveText('Libres 3 · OpenF1');
+  await expect(page.locator('#resultado tbody tr')).toHaveCount(22);
+  await expect(page.locator('#resultado tbody tr').first()).toContainText(/Russell/i);
+  await page.goto('/categoria/f1/archivo/2026/21?sesion=openf1%3A11414');
   await expect(page.locator('#resultado h2')).toHaveText('Libres 2 · OpenF1');
   await expect(page.locator('#resultado tbody tr')).toHaveCount(22);
   await expect(page.locator('#resultado tbody tr').first()).toContainText(/Russell/i);
   const saved=await request.get('/api/fechas/f1/2026/21').then((r)=>r.json());
   expect(saved.event.tables.find((t:{id:string})=>t.id==='openf1:11414').rows).toHaveLength(22);
+  expect(saved.event.tables.find((t:{id:string})=>t.id==='openf1:11415').rows).toHaveLength(22);
   await page.getByLabel('Elegí una sesión o estadística').selectOption({label:'Libres 1 · Estado'});
+  await expect(page).toHaveURL(/sesion=openf1%3A11413/);
+  await page.reload();
   await expect(page.locator('#resultado')).toContainText('sin vueltas cronometradas oficiales');
   await expect(page.getByRole('heading',{name:'Telemetría · Libres 1'})).toBeVisible();
   expect((await request.get('/api/f1/telemetria/11414?piloto=999&vuelta=1')).status()).toBe(404);
@@ -36,7 +43,7 @@ test('telemetría bajo demanda, comparación y cancelación al cambiar vuelta',a
     const url=new URL(route.request().url());
     await route.fulfill({json:{session:Number(url.pathname.split('/').at(-1)),driver:wrongCopy?999:Number(url.searchParams.get('piloto')),lap:Number(url.searchParams.get('vuelta')),points:[{t:0,speed:100,throttle:50,brake:0,gear:3,rpm:7000},{t:1,speed:150,throttle:80,brake:null,gear:4,rpm:9000}],window:{from:'2026-11-20T04:10Z',to:'2026-11-20T04:11Z',truncated:false}}});
   });
-  await page.goto('/categoria/f1/archivo/2026/21');
+  await page.goto('/categoria/f1/archivo/2026/21?sesion=openf1%3A11414');
   await expect(page.getByRole('heading',{name:'Telemetría · Libres 2'})).toBeVisible();
   expect(calls).toBe(0);
   await page.getByLabel('Comparar con',{exact:true}).selectOption('63');
